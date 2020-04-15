@@ -162,13 +162,13 @@ std::string HTTPNTLMCredentials::createNTLMMessage(const std::string& responseAu
 
 				NTLMCredentials::AuthenticateMessage authenticateMsg;
 				authenticateMsg.flags = challengeMsg.flags;
-				authenticateMsg.target = challengeMsg.target;
+				authenticateMsg.target = domain;
 				authenticateMsg.username = username;
 
 				std::vector<unsigned char> lmNonce = NTLMCredentials::createNonce();
 				std::vector<unsigned char> ntlmNonce = NTLMCredentials::createNonce();
 				Poco::UInt64 timestamp = NTLMCredentials::createTimestamp();
-				std::vector<unsigned char> ntlm2Hash = NTLMCredentials::createNTLMv2Hash(username, challengeMsg.target, _password);
+				std::vector<unsigned char> ntlm2Hash = NTLMCredentials::createNTLMv2Hash(username, domain, _password);
 
 				authenticateMsg.lmResponse = NTLMCredentials::createLMv2Response(ntlm2Hash, challengeMsg.challenge, lmNonce);
 				authenticateMsg.ntlmResponse = NTLMCredentials::createNTLMv2Response(ntlm2Hash, challengeMsg.challenge, ntlmNonce, challengeMsg.targetInfo, timestamp);

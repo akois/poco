@@ -101,7 +101,7 @@ void HTTPCredentials::authenticate(HTTPRequest& request, const HTTPResponse& res
 			{
 				_ntlm.setHost(request.getHost());
 			}
-			_ntlm.authenticate(request, iter->second.substr(5));
+			_ntlm.authenticate(request, Poco::trimLeft(iter->second.substr(4)));
 			return;
 		}
 	}
@@ -148,7 +148,7 @@ void HTTPCredentials::proxyAuthenticate(HTTPRequest& request, const HTTPResponse
 		{
 			_ntlm.setUsername(_digest.getUsername());
 			_ntlm.setPassword(_digest.getPassword());
-			_ntlm.proxyAuthenticate(request, iter->second.substr(5));
+			_ntlm.proxyAuthenticate(request, Poco::trimLeft(iter->second.substr(4)));
 			return;
 		}
 	}
@@ -191,7 +191,7 @@ bool HTTPCredentials::isDigestCredentials(const std::string& header)
 
 bool HTTPCredentials::isNTLMCredentials(const std::string& header)
 {
-	return icompare(header, 0, 4, "NTLM") == 0 && (header.size() > 5 ? Poco::Ascii::isSpace(header[5]) : true);
+	return icompare(header, 0, 4, "NTLM") == 0 && (header.size() > 4 ? Poco::Ascii::isSpace(header[4]) : true);
 }
 
 
