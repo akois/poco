@@ -528,6 +528,8 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 
 				_extraSecBuffer.pvBuffer = 0;
 				_extraSecBuffer.cbBuffer = 0;
+
+				cont = true;
 			}
 		}
 		while (cont);
@@ -643,13 +645,18 @@ SECURITY_STATUS SecureSocketImpl::decodeBufferFull(BYTE* pBuffer, DWORD bufSize,
 			}
 		}
 
-		if (securityStatus == SEC_I_RENEGOTIATE)
+		/*if (securityStatus == SEC_I_RENEGOTIATE)
 		{
 			_needData = false;
 			securityStatus = performClientHandshakeLoop();
 			if (securityStatus != SEC_E_OK)
 				break;
-		}
+			else 
+			{
+				pBuffer = 0;
+				bufSize = 0;
+			}
+		}*/
 	}
 	while (securityStatus == SEC_E_OK && pBuffer);
 
@@ -877,6 +884,10 @@ SECURITY_STATUS SecureSocketImpl::performClientHandshakeLoop()
 				performClientHandshakeLoopError();
 			}
 		}
+		else if (_securityStatus == SEC_I_INCOMPLETE_CREDENTIALS)
+		{
+			_needData = false;
+		}
 		else
 		{
 			performClientHandshakeLoopIncompleteMessage();
@@ -936,7 +947,7 @@ void SecureSocketImpl::performClientHandshakeExtraBuffer()
 
 void SecureSocketImpl::performClientHandshakeLoopOK()
 {
-	poco_assert_dbg(_securityStatus == SEC_E_OK);
+	//poco_assert_dbg(_securityStatus == SEC_E_OK);
 
 	performClientHandshakeSendOutBuffer();
 	performClientHandshakeExtraBuffer();
@@ -1032,6 +1043,7 @@ void SecureSocketImpl::performClientHandshakeLoopContinueNeeded()
 void SecureSocketImpl::performClientHandshakeLoopIncompleteMessage()
 {
 	_needData = true;
+	
 	_state = ST_CLIENTHANDSHAKECONDREAD;
 }
 
